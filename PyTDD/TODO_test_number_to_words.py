@@ -3,8 +3,33 @@ from TODO_number_to_words import number_to_words
 
 class TestNums(unittest.TestCase):
     
-    # TODO
-    # Adauga codul pentru unit tests aici
+    # ======== Step 1 ======== 
+    def test_no_input(self):
+        self.assertEqual(number_to_words(None), None)
 
-    def sample_unit_test(self):
-        return None
+    # ======== Step 2 ======== 
+    def test_no_input(self):
+        self.assertEqual(number_to_words('a'), None)
+
+    # ======== Step 3 ======== 
+    def test_num_vir(self):
+        self.assertEqual(number_to_words(123.4), None)
+
+
+    # ======== Step 4 ======== 
+    def test_range_min(self):
+        self.assertEqual(number_to_words(0), None)
+
+    # ======== Step 5 ======== 
+    def test_range_max(self):
+        self.assertEqual(number_to_words(4000), None)
+
+# class TestOnes(unittest.TestCase):
+
+#     def test_base_1(self):
+#         self.assertEqual(number_to_words(1), 'one')
+
+class TestTens(unittest.TestCase):
+
+    def test_base_1000(self):
+        self.assertEqual(number_to_words(1000), 'one thousands')
