@@ -9,13 +9,13 @@ def number_to_words(n):
     out = ''
 
     VALUES_1 = [
-        (1000, ' thousands'),
-        (100, ' hundreds'),
-        (10, 'ty'),
+        (1000, 'thousands'),
+        (100, 'hundreds'),
         (50, 'fifty'),
         (40, 'forty'),
         (30, 'thirty'),
         (20, 'twenty'),
+        (0, 'ty'),
         (12, 'twelve'),
         (11, 'eleven'),
         (10, 'ten'),
@@ -38,24 +38,24 @@ def number_to_words(n):
 
     num = 0
 
-    # for (value, symbol) in VALUES_1:
-    #     # while n >= value:
-    #     #       num += 1
-    #     #       n -= value
-    #     if n / value != 0:
-    #         # out += str(n / value) + symbol
-    #         out += symbol(n / value) + symbol 
-    #     n -= value * ( n / value )
-
-
     for value, symbol in VALUES_1:
-        count = n // value
-        if count != 0:
-            out += get_symbol(count) + ' ' + get_symbol(value)
-        n -= value * ( n / value )
-        
+        if value >= 100:
+            count = n // value
+            if count != 0:
+                out += ' ' + get_symbol(count) + ' ' + get_symbol(value)
+            n -= value * count
+
+        # elif value >= 60:
+        #     count = value / 10
+        #     if count == n / 10:
+        #         out += ' ' + get_symbol(count) + get_symbol(0)
+
+        elif value >= 20:
+            count = value / 10
+            if count == n / 10:
+                out += ' ' + get_symbol(value) + ' ' + get_symbol(n % 10)
 
     return out
 
 
-# 5479 = 5 thousands, 4 hundreds, 7 tens, 9 ones
+# 3479 = 3 thousands, 4 hundreds, 7 tens, 9 ones

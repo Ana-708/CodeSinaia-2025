@@ -6,7 +6,6 @@ class TestInvalidInput(unittest.TestCase):
     def test_no_input(self):
         self.assertEqual(roman_converter(None), None)
 
-
     # ======== Step 2 ======== 
     def test_num_str(self):
         self.assertEqual(roman_converter('a'), None)
