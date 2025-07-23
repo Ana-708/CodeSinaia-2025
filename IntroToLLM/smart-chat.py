@@ -1,4 +1,3 @@
-import ollama
 from smart_agent import SmartAgent
 
 chat_log = []
