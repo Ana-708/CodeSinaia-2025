@@ -58,18 +58,38 @@ def message_probability(user_message, keywords, single_response=False, required=
     #TODO: Calculează probabilitatea mesajului message_certainty
     #pt fiecare cuvant din mesaj care apare in recognised_words
     #message_certainty este incrementat
+    message_certainty = 0
+
+    for word in user_message:
+        if word in keywords:
+            message_certainty += 1
     
     #TODO: Calculează match_ratio ca raportul dintre message_certainty și numărul de cuvinte din keywords
     #dacă keywords este gol, setăm match_ratio la 0
+    match_ratio = message_certainty / len(keywords) if keywords else 0
     
     
     if required:
         if not all(word in user_message for word in required):
             return 0
+        
     match_ratio = match_ratio
+
     if single_response:
         return 1 if match_ratio > 0 else 0
+    
     return int(match_ratio * 100) if match_ratio > 0 else 0
+
+       
+    # if len(keywords) > 0:
+    #     match_ratio = message_certainty / len(keywords)
+    # else:
+    #     match_ratio = 0
+
+
+
+
+
 
 def check_all_messages(message):
     highest_prob = 0
@@ -80,21 +100,33 @@ def check_all_messages(message):
         
         #TODO: Calculează probabilitatea mesajului pentru fiecare regulă
         #folosind funcția message_probability definită mai sus
+        prob = message_probability(message, rule["keywords"], rule.get("single_response", False), rule.get("required", [])) #??
         
         #TODO: dacă prob este mai mare decât highest_prob,
         # actualizează best_response și highest_prob
+        if prob > highest_prob:
+            best_response = rule["response"]
+            highest_prob = prob
         
         
     #TODO: returneaza raspunsul, fie cel de eroare, fie cel gasit 
+    if best_response is not None:
+        return best_response
+    else:
+        return unknown()
     
 
 def get_response(user_input):
     None
     #TODO: Verifică dacă user_input este gol sau conține doar spații
+    if not user_input.strip():
+        return "Please enter a message."
 
     #TODO: apeleaza functia split pentru a împărți mesajul în cuvinte 
+    user_message = re.split(r'\s+|[,;?.-]\s*', user_input.lower())
     
     # apoi returneaza rezultatul obtinut folosind check_all_messages pentru a verifica mesajul
+    return check_all_messages(user_message)
 
 # Ce inseamna \s+|[,;?.-]\s*?
 # \s+ înseamnă unul sau mai multe spații albe (inclusiv tab-uri și linii noi)
