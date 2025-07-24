@@ -1,35 +1,42 @@
 import re
-from responses import get_custom_response, unknown
+try:
+    from .responses import get_custom_response, unknown
+except ImportError:
+    from responses import get_custom_response, unknown
+import random
+
+colors = ["blue", "red", "green", "yellow", "purple", "pink"]
+hearts = ["💙", "❤️", "💚", "💛", "💜", "🩷"]
+
+def favorite_color_response():
+    idx = random.randint(0, len(colors) - 1)
+    return f"My favorite color is {colors[idx]} {hearts[idx]}"
+
 RULES = [
     {
-        "keywords": ["hello", "morning", "night", "afternoon","hi", "hii", "hiii", "hiiii", "hey", "heyy", "heyyy", "heyyyy", "hei", "salut"],
+        "keywords": ["hello", "hi", "hey", "salut"],
         "response": "Hello! 😊",
         "single_response": True
     },
     {
-    "keywords": ["how", "are", "you", "doing", "how's", "your", "day", "what's", "up", "what"],
-        # "required": ["you"],
+        "keywords": ["how", "are", "you", "doing"],
+        "required": ["you"],
         "response": "I'm doing fine, and you?"
     },
     {
-        "keywords": ["what", "is", "your", "name", "what's"],
+        "keywords": ["what", "is", "your", "name"],
         "required": ["name"],
         "response": "I'm CodePal, your friendly chatbot 🤖"
     },
     {
-        "keywords": ["who", "are", "you"],
-        "required": ["who", "you"],
-        "response": "I'm CodePal, your friendly chatbot 🤖"
-    },
-    {
-        "keywords": ["i", "love", "like", "code", "palace", "you"],
+        "keywords": ["i", "love", "code", "palace"],
         "required": ["code"],
         "response": "Thank you! ❤️"
     },
     {
-        "keywords": ["what", "like", "do", "you", "to", "eat"],
+        "keywords": ["what", "you", "eat", "like"],
         "required": ["eat"],
-        "response": lambda: get_custom_response("eat")
+        "response": get_custom_response("eat")
     },
     {
         "keywords": ["bye", "goodbye", "see"],
@@ -42,8 +49,8 @@ RULES = [
         "single_response": True
     },
     {
-        "keywords": ["joke", "funny", "humor", "laugh"],
-        "response": lambda: get_custom_response("joke"),
+        "keywords": ["joke", "funny"],
+        "response": "Why don't programmers like nature? It has too many bugs! 😂",
         "single_response": True
     },
     {
@@ -56,12 +63,14 @@ RULES = [
         "response": unknown(),
         "single_response": True
     },
-    ###########################################
+    # TODO: creeaza tu un raspuns custom pentru un topic ales
+    # exemmplu: care este culoarea ta preferata?
     {
-        "keywords": ["my", "name", "is"],
-        "required": ["my","name"],
-        "response": "Nice to meet you! 😊",
-    },
+        "keywords": ["favorite", "color"],
+        "required": ["color"],
+        "response": favorite_color_response,
+        "single_response": True
+    }
 ]
 
 def message_probability(user_message, keywords, single_response=False, required=[]):
@@ -69,76 +78,57 @@ def message_probability(user_message, keywords, single_response=False, required=
     #TODO: Calculează probabilitatea mesajului message_certainty
     #pt fiecare cuvant din mesaj care apare in recognised_words
     #message_certainty este incrementat
-    message_certainty = 0
-
-    for word in user_message:
-        if word in keywords:
-            message_certainty += 1
+    message_certainty = sum(1 for word in user_message if word in keywords)
     
     #TODO: Calculează match_ratio ca raportul dintre message_certainty și numărul de cuvinte din keywords
     #dacă keywords este gol, setăm match_ratio la 0
     match_ratio = message_certainty / len(keywords) if keywords else 0
     
-    
     if required:
         if not all(word in user_message for word in required):
             return 0
-        
-    match_ratio = match_ratio
 
     if single_response:
         return 1 if match_ratio > 0 else 0
-    
     return int(match_ratio * 100) if match_ratio > 0 else 0
-
-       
-    # if len(keywords) > 0:
-    #     match_ratio = message_certainty / len(keywords)
-    # else:
-    #     match_ratio = 0
-
-
-
-
-
 
 def check_all_messages(message):
     highest_prob = 0
     best_response = None
 
     for rule in RULES:
-        None
-        
         #TODO: Calculează probabilitatea mesajului pentru fiecare regulă
         #folosind funcția message_probability definită mai sus
-        prob = message_probability(message, rule["keywords"], rule.get("single_response", False), rule.get("required", [])) #??
-        
+        prob = message_probability(
+            message,
+            rule["keywords"],
+            rule.get("single_response", False),
+            rule.get("required", [])
+        )
+
         #TODO: dacă prob este mai mare decât highest_prob,
         # actualizează best_response și highest_prob
         if prob > highest_prob:
-            best_response = rule["response"]
             highest_prob = prob
+            best_response = rule["response"]
+
+    # Dacă best_response e funcție, o apelezi
+    if callable(best_response):
+        return best_response()
     
-    if(callable(best_response)):
-        return best_response()  # Apelează funcția dacă best_response este o funcție
     #TODO: returneaza raspunsul, fie cel de eroare, fie cel gasit 
-    if best_response is not None:
-        return best_response
-    else:
-        return unknown()
-    
+    return best_response if highest_prob > 0 else unknown()
 
 def get_response(user_input):
-    None
     #TODO: Verifică dacă user_input este gol sau conține doar spații
-    if not user_input.strip():
+    if not user_input or user_input.strip() == "":
         return "Please enter a message."
 
     #TODO: apeleaza functia split pentru a împărți mesajul în cuvinte 
-    user_message = re.split(r'\s+|[,;?.-]\s*', user_input.lower())
+    split_message = re.split(r'\s+|[,;?.-]\s*', user_input.lower())
     
     # apoi returneaza rezultatul obtinut folosind check_all_messages pentru a verifica mesajul
-    return check_all_messages(user_message)
+    return check_all_messages(split_message)
 
 # Ce inseamna \s+|[,;?.-]\s*?
 # \s+ înseamnă unul sau mai multe spații albe (inclusiv tab-uri și linii noi)
