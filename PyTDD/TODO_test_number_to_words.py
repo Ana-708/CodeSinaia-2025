@@ -35,10 +35,16 @@ class TestTens(unittest.TestCase):
         self.assertEqual(number_to_words(1000), ' one thousands')
 
     def test_base_3429(self):
-        self.assertEqual(number_to_words(3429), ' three thousands four hundreds twenty nine')
+        self.assertEqual(number_to_words(3249), ' three thousands two hundreds forty nine')
 
     def test_base_2400(self):
         self.assertEqual(number_to_words(2400), ' two thousands four hundreds')
 
     def test_base_3000(self):
         self.assertEqual(number_to_words(3000), ' three thousands')
+
+    def test_base_2076(self):
+        self.assertEqual(number_to_words(2076), ' two thousands seventy six')
+
+    def test_base_1011(self):
+        self.assertEqual(number_to_words(1000), ' one thousands eleven')

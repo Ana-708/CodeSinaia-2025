@@ -16,6 +16,9 @@ def number_to_words(n):
         (30, 'thirty'),
         (20, 'twenty'),
         (0, 'ty'),
+        (15, 'fifteen'),
+        (14, 'forteen'),
+        (13, 'thirteen'),
         (12, 'twelve'),
         (11, 'eleven'),
         (10, 'ten'),
@@ -38,22 +41,31 @@ def number_to_words(n):
 
     num = 0
 
+    ok = 1
+
+    
     for value, symbol in VALUES_1:
-        if value >= 100:
-            count = n // value
-            if count != 0:
-                out += ' ' + get_symbol(count) + ' ' + get_symbol(value)
-            n -= value * count
+        if ok == 1:
+            if value >= 100:
+                count = n // value
+                if count != 0:
+                    out += ' ' + get_symbol(count) + ' ' + get_symbol(value)
+                n -= value * count
 
-        # elif value >= 60:
-        #     count = value / 10
-        #     if count == n / 10:
-        #         out += ' ' + get_symbol(count) + get_symbol(0)
+            elif value >= 20 and value <= 50:
+                count = value // 10
+                if count == n // 10:
+                    out += ' ' + get_symbol(value)+ ' ' + get_symbol(n % 10)
+                    ok = 0
+                    n -= value
 
-        elif value >= 20:
-            count = value / 10
-            if count == n / 10:
-                out += ' ' + get_symbol(value) + ' ' + get_symbol(n % 10)
+            elif value <= 15 and value >= 1:
+                if value == n:
+                    out += ' ' + get_symbol(value)
+                    n -= value
+                elif n // 10 == value:
+                    out += ' ' + get_symbol(value) + get_symbol(0)
+                    n -= value * 10
 
     return out
 
